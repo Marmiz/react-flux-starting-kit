@@ -4,7 +4,6 @@ var gulp = require('gulp');
 var connect = require('gulp-connect'); // run a local web server
 var open = require('gulp-open'); //open URL in a new browser
 var browserify = require('browserify'); //bundle js
-var reactify = require('reactify'); //complie JSX in JS
 var source = require('vinyl-source-stream'); //use conventional text stream with gulp
 var concat = require('gulp-concat'); //Concatenates files
 var lint = require('gulp-eslint'); //Lint JS files, including JSX
@@ -19,6 +18,7 @@ var config = {
     css: [
         'node_modules/bootstrap/dist/css/bootstrap.min.css',
         'node_modules/bootstrap/dist/css/bootstrap-theme.min.css'
+        'node_modules/toastr/build/toastr.css'
     ],
     dist: './dist',
     mainJs: './src/main.js'
@@ -53,7 +53,7 @@ gulp.task('html', function() {
 
 gulp.task('js', function() {
   browserify(config.paths.mainJs)
-    .transform(reactify)
+    .transform("babelify", {presets: ["react"]})
     .bundle() //bundle in the same file
     .on('error', console.error.bind(console)) //spit error on console
     .pipe(source('bundle.js'))
@@ -69,7 +69,7 @@ gulp.task('css', function() {
 
 gulp.task('lint', function() {
 	return gulp.src(config.paths.js)
-		.pipe(lint({configFile: 'eslint.json'})) //new syntax
+		.pipe(lint({config: '.eslintrc'})) //new syntax
 		.pipe(lint.format());
 });
 
